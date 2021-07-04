@@ -1,0 +1,14 @@
+ginEngine.POST("/verifyToken", r.loginHandler.VerifyToken)
+
+func (l *Login) VerifyToken(context *gin.Context) {
+	tokenString := context.Request.Header.Get("apikey")
+	referer := context.Request.Header.Get("Referer")
+
+	valid, claims := l.loginService.VerifyToken(tokenString, referer)
+	if !valid {
+		returnUnauthorized(context)
+		return
+	}
+	ok(context, http.StatusOK, "token is valid", claims)
+}
+
