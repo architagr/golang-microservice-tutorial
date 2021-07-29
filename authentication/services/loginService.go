@@ -1,12 +1,13 @@
 package services
 
 import (
-	"github.com/architagr/golang-microservice-tutorial/authentication/models"
-	"github.com/architagr/golang-microservice-tutorial/authentication/repository"
-	"github.com/architagr/golang-microservice-tutorial/authentication/token"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/architagr/golang-microservice-tutorial/authentication/models"
+	"github.com/architagr/golang-microservice-tutorial/authentication/repository"
+	"github.com/architagr/golang-microservice-tutorial/authentication/token"
 )
 
 type Login struct {

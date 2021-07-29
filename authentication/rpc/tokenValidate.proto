@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package rpc_auth;
+option go_package = "./rpc_auth";
+
+message ValidateTokenRequest {
+    string Token = 1;
+}
+
+message ValidateTokenResponse {
+    bool IsValid = 1;
+    string ComapnyId =2;
+    string Username = 3;
+    repeated int32 Roles = 4; 
+}
+
+service ValidateTokenService{
+    rpc Validate(stream ValidateTokenRequest) returns  (stream ValidateTokenResponse){}
+}

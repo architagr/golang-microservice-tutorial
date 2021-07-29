@@ -1,0 +1,30 @@
+syntax = "proto3";
+package rpc_auth;
+option go_package = "./rpc_auth";
+
+message LoginRequest{
+    string Username = 1;
+    string Password = 2;
+    bool RememberMe = 3;   
+}
+
+message LoginResponse{
+    LoginRequest loginDetails = 1;
+    string token = 2;
+}
+message LoginRequestList{
+    repeated  LoginRequest data =1;
+}
+
+message LoginResponseList{
+    repeated  LoginResponse data =1;
+}
+
+service LoginService{
+    rpc LoginSimpleRPC(LoginRequest) returns  (LoginResponse){}
+    rpc LoginServerStreamRPC(LoginRequestList) returns  (stream LoginResponse){}
+    rpc LoginClientStreamRPC(stream LoginRequest) returns  (LoginResponseList){}
+    rpc LoginBiDirectionalRPC(stream LoginRequest) returns  (stream LoginResponse){}
+}
+
+
