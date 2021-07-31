@@ -1,9 +1,10 @@
 package token
 
 import (
-	"github.com/architagr/golang-microservice-tutorial/authentication/models"
 	"fmt"
 	"time"
+
+	"github.com/architagr/golang-microservice-tutorial/authentication/models"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -26,6 +27,7 @@ const (
 
 func GenrateToken(claims *models.JwtClaims, expirationTime time.Time) (string, *models.ErrorDetail) {
 
+
 	claims.ExpiresAt = expirationTime.Unix()
 	claims.IssuedAt = time.Now().UTC().Unix()
 	claims.Issuer = *ip
@@ -46,6 +48,7 @@ func GenrateToken(claims *models.JwtClaims, expirationTime time.Time) (string, *
 func VerifyToken(tokenString, origin string) (bool, *models.JwtClaims) {
 	claims := &models.JwtClaims{}
 	token, _ := getTokenFromString(tokenString, claims)
+	
 	if token.Valid {
 		if claims.VerifyAudience(origin) {
 			return true, claims

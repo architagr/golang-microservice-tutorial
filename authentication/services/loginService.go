@@ -8,6 +8,7 @@ import (
 	"github.com/architagr/golang-microservice-tutorial/authentication/models"
 	"github.com/architagr/golang-microservice-tutorial/authentication/repository"
 	"github.com/architagr/golang-microservice-tutorial/authentication/token"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type Login struct {
@@ -29,11 +30,14 @@ func (l *Login) GetToken(loginModel models.LoginRequest, origin string) (string,
 	if err !=nil{
 		return "", err
 	}
-	var claims = &models.JwtClaims{}
-	claims.ComapnyId = strconv.Itoa(user.Id)
-	claims.Username = user.Name
-	claims.Roles = user.Roles
-	claims.Audience = origin
+	var claims = &models.JwtClaims{
+		ComapnyId: strconv.Itoa(user.Id),
+		Username: user.Name,
+		Roles: user.Roles,
+		StandardClaims: jwt.StandardClaims{
+			Audience: origin,
+		},
+	}
 	var tokenCreationTime = time.Now().UTC()
 	var expirationTime = tokenCreationTime.Add(time.Duration(2) * time.Hour)
 	return token.GenrateToken(claims, expirationTime)

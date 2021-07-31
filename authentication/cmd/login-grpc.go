@@ -6,9 +6,10 @@ import (
 	"log"
 	"net"
 
-	rpc_auth "./../../rpc/rpc_auth"
 	"github.com/architagr/golang-microservice-tutorial/authentication/models"
 	"github.com/architagr/golang-microservice-tutorial/authentication/services"
+	"github.com/architagr/golang-microservice-tutorial/authentication/token"
+	rpc_auth "github.com/architagr/golang-microservice-tutorial/rpc/rpc_auth"
 
 	"google.golang.org/grpc"
 )
@@ -22,7 +23,7 @@ var flags *models.Flags
 func main() {
 	flag.Parse()
 	flags = models.NewFlags(*ip, *port)
-
+	token.Init()
 	url, _ := flags.GetApplicationUrl()
 
 	lis, err := net.Listen("tcp", *url)
@@ -33,9 +34,13 @@ func main() {
 
 	grpcServer := grpc.NewServer(opts...)
 	rpc_auth.RegisterLoginServiceServer(grpcServer, &services.LoginRpcServer{})
+	rpc_auth.RegisterValidateTokenServiceServer(grpcServer,&services.ValidateRpcServer{})
+	fmt.Println("starting grpc server on", *url)
 	err1 := grpcServer.Serve(lis)
 	if err1 == nil {
 		fmt.Println("grpc server running on", *url)
+	}else{
+		fmt.Println("grpc server running error on", err1)
 	}
 }
 

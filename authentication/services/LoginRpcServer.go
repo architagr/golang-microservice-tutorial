@@ -2,22 +2,26 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
 
 	"github.com/architagr/golang-microservice-tutorial/authentication/models"
-	"github.com/architagr/golang-microservice-tutorial/authentication/services"
 	rpc_auth "github.com/architagr/golang-microservice-tutorial/rpc/rpc_auth"
 )
+
 type LoginRpcServer struct {
 	rpc_auth.UnimplementedLoginServiceServer
 }
 
 func (LoginRpcServer) LoginSimpleRPC(ctx context.Context, in *rpc_auth.LoginRequest) (*rpc_auth.LoginResponse, error) {
 	logger := log.New(os.Stdout, "loginRpc", 1)
-	flags := models.NewFlags("", "")
-	service := services.NewLogin(logger, flags)
+	flags, err := models.GetFlags()
+	if err != nil {
+		return nil, err
+	}
+	service := NewLogin(logger, flags)
 	loginModel := models.LoginRequest{
 		UserName:   in.Username,
 		Password:   in.Password,
@@ -36,9 +40,12 @@ func (LoginRpcServer) LoginSimpleRPC(ctx context.Context, in *rpc_auth.LoginRequ
 func (LoginRpcServer) LoginServerStreamRPC(in *rpc_auth.LoginRequestList, stream rpc_auth.LoginService_LoginServerStreamRPCServer) error {
 	for _, loginCred := range in.Data {
 		logger := log.New(os.Stdout, "loginRpc", 1)
-		flags := models.NewFlags("", "")
+		flags, err := models.GetFlags()
+		if err != nil {
+			return err
+		}
 
-		service := services.NewLogin(logger, flags)
+		service := NewLogin(logger, flags)
 		loginModel := models.LoginRequest{
 			UserName:   loginCred.Username,
 			Password:   loginCred.Password,
@@ -65,9 +72,12 @@ func (LoginRpcServer) LoginClientStreamRPC(stream rpc_auth.LoginService_LoginCli
 		Data: make([]*rpc_auth.LoginResponse, 0, 10),
 	}
 	logger := log.New(os.Stdout, "loginRpc", 1)
-	flags := models.NewFlags("", "")
+	flags, err := models.GetFlags()
+	if err != nil {
+		return err
+	}
 
-	service := services.NewLogin(logger, flags)
+	service := NewLogin(logger, flags)
 	for {
 		loginCred, err := stream.Recv()
 		if err == io.EOF {
@@ -102,12 +112,16 @@ func (LoginRpcServer) LoginBiDirectionalRPC(stream rpc_auth.LoginService_LoginBi
 			return nil
 		}
 		if err != nil {
+			fmt.Println("error in reading data", err)
 			return err
 		}
 		logger := log.New(os.Stdout, "loginRpc", 1)
-		flags := models.NewFlags("", "")
+		flags, err := models.GetFlags()
+		if err != nil {
+			return err
+		}
 
-		service := services.NewLogin(logger, flags)
+		service := NewLogin(logger, flags)
 		loginModel := models.LoginRequest{
 			UserName:   in.Username,
 			Password:   in.Password,
